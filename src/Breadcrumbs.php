@@ -19,12 +19,13 @@ class Breadcrumbs
     protected $breadcrumbsCssClasses = array();
 
     /**
-     * The divider symbol between the breadcrumbs. Uses a slash as a default,
-     * since that's the Twitter Bootstrap style.
+     * The divider symbol between the breadcrumbs.
+     * Default is empty string since Twitter Bootstrap style add this
+     * divider in CSS.
      *
      * @var string
      */
-    protected $divider = '/';
+    protected $divider = '';
 
     /**
      * The DOM-element that wraps the breadcrumbs. Set to ul by default.
@@ -43,7 +44,7 @@ class Breadcrumbs
         $this->setBreadcrumbs($breadcrumbs);
 
         if (!$cssClasses) {
-            $this->setCssClasses('breadcrumbs');
+            $this->setCssClasses('breadcrumb');
         } else {
             $this->setCssClasses($cssClasses);
         }
