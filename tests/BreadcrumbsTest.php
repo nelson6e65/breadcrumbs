@@ -85,6 +85,38 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
+                        'name' => 'Home',
+                        'href' => '/',
+                    ),
+                    array(
+                        'name' => 'Pages',
+                        'href' => 'pages',
+                    ),
+                ),
+                array(
+                    'breadcrumb',
+                ),
+                null // Not divider
+            ),
+            array(
+                array(
+                    array(
+                        'name' => 'Home',
+                        'href' => '/',
+                    ),
+                    array(
+                        'name' => 'Pages',
+                        'href' => 'pages',
+                    ),
+                ),
+                array(
+                    'breadcrumbs',
+                ),
+                '' // Empty divider
+            ),
+            array(
+                array(
+                    array(
                         'name' => 'Admin home',
                         'href' => '/admin',
                     ),
@@ -100,6 +132,7 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
                 array(
                     'breadcrumbs-class',
                 ),
+                '/',
             ),
             array(
                 array(
@@ -120,6 +153,7 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
                     'breadcrumbs-class',
                     'additional-breadcrumbs-class',
                 ),
+                '»',
             ),
         );
     }
@@ -398,9 +432,13 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider crumbsWithCssClassesProvider
      */
-    public function testOutput($crumbs, $classes)
+    public function testOutput($crumbs, $classes, $divider = null)
     {
         $b = new Breadcrumbs($crumbs, $classes);
+
+        if (is_string($divider)) {
+            $b->setDivider($divider);
+        }
 
         $crawler = new Crawler($b->render());
 
@@ -417,8 +455,10 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
 
         /**
          * There should be one `span.divider` less than there are breadcrumbs.
+         * Or zero if divider is set to empty string or null.
          */
-        $this->assertCount(count($crumbs)-1, $crawler->filter('span.divider'));
+        $dividersCount = $b->getDivider() ? count($crumbs) - 1 : 0;
+        $this->assertCount($dividersCount, $crawler->filter('span.divider'));
     }
 
     /**
@@ -442,24 +482,6 @@ class BreadcrumbsTest extends PHPUnit_Framework_TestCase
         $this->assertSame($normalizedExpectedClasses, $normalizedUlClasses);
     }
 
-    /**
-     * Tests that no dividers are rendered if the divider is set to `null`.
-     *
-     * @dataProvider crumbsWithCssClassesProvider
-     */
-    public function testOutputWithoutDividers($crumbs, $classes)
-    {
-        $b = new Breadcrumbs($crumbs, $classes);
-
-        $b->setDivider(null);
-
-        $crawler = new Crawler($b->render());
-
-        /**
-         * There should be no `span.divider` elements present.
-         */
-        $this->assertCount(0, $crawler->filter('span.divider'));
-    }
 
     /**
      * Tests whether full URLs are recognized correctly.
